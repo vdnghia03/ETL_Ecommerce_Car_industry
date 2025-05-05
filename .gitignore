@@ -1,0 +1,86 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.env/
+.venv/
+ENV/
+my_env/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Logs
+*.log
+logs/
+
+# Local development settings
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite3
+
+# # Output files
+# *.csv
+# *.json
+# *.xlsx
+# *.pdf
+
+# Documentation
+docs/_build/
+site/
+
+# Poetry
+poetry.lock
+
+# Pipenv
+Pipfile.lock
+
+*.logs_queue/
+*.nux/
+*.telemetry/
+
+*config/
+*storage/
+
+/dataset
