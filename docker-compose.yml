@@ -108,19 +108,19 @@ services:
     networks:
       - de_network
     
-#   # Pipelines
-#   etl_pipeline:
-#     build:
-#       context: ./etl_pipeline
-#       dockerfile: ./Dockerfile
-#     container_name: etl_pipeline
-#     image: etl_pipeline:latest
-#     volumes:
-#       - ./etl_pipeline:/opt/dagster/app
-#     env_file:
-#       - ./.env
-#     networks:
-#       - de_network
+  # Pipelines
+  etl_pipeline:
+    build:
+      context: ./etl_pipeline
+      dockerfile: ./Dockerfile
+    container_name: etl_pipeline
+    image: etl_pipeline:latest
+    volumes:
+      - ./etl_pipeline:/opt/dagster/app
+    env_file:
+      - ./.env
+    networks:
+      - de_network
   
 networks:
   de_network:
