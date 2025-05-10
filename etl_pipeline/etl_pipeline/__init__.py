@@ -3,6 +3,7 @@ import os
 from dagster import Definitions
 from .assets.bronze_layer import *
 from .assets.silver_layer import *
+from .assets.gold_layer import *
 from .resources.minio_io_manager import MinIOIOManager
 from .resources.mysql_io_manager import MySQLIOManager
 from .resources.psql_io_manager import PostgreSQLIOManager
@@ -28,20 +29,17 @@ PSQL_CONFIG = {
     "password": os.getenv("POSTGRES_PASSWORD")
 }
 
-# ls_asset=[asset_factory(table) for table in tables] + [silver_statsTeamOnGames, 
-#                                                        silver_teams ,
-#                                                        silver_playerAppearances,
-#                                                        gold_statsPerLeagueSeason,
-#                                                        gold_statsPerPlayerSeason, 
-#                                                        gold_statsPlayerPer90,
-#                                                        statsPerLeagueSeason,
-#                                                        statsPerPlayerSeason,
-#                                                        statsPlayerPer90]
 
 
-
-
-ls_asset=[asset_factory(table) for table in tables] + [silver_crm_cust_info, silver_crm_prd_info]
+ls_asset=[asset_factory(table) for table in tables] + [silver_crm_cust_info
+                                                       , silver_crm_prd_info
+                                                       , silver_crm_sales_details
+                                                       , silver_erp_cust_az12
+                                                       , silver_erp_loc_a101
+                                                       , silver_erp_px_cat_g1v2
+                                                       , gold_dim_customer
+                                                       , gold_dim_product
+                                                       , gold_fact_sales]
 
 defs = Definitions(
     assets=ls_asset,
