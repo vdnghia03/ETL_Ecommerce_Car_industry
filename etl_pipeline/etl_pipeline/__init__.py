@@ -64,9 +64,10 @@
 # )
 
 import os
-from dagster import Definitions
+from dagster import Definitions, AssetKey, AutoMaterializePolicy
 # from dagster_dbt import dbt_assets
 from dagster_dbt import DbtCliResource, dbt_assets
+
 from .assets.bronze_layer import *
 from .assets.silver_layer import *
 from .assets.gold_layer import *
@@ -112,10 +113,33 @@ ls_asset = [asset_factory(table) for table in tables] + [
     warehouse_fact_sales
 ]
 
-@dbt_assets(manifest="/opt/dagster/app/etl_pipeline/dbt/warehouse_tests/target/manifest.json")
+@dbt_assets(
+    manifest="/opt/dagster/app/etl_pipeline/dbt/warehouse_tests/target/manifest.json",
+    # deps=[
+    #     AssetKey("warehouse_dim_customer"),
+    #     AssetKey("warehouse_dim_product"),
+    #     AssetKey("warehouse_fact_sales")
+    # ],
+    #auto_materialize_policy=AutoMaterializePolicy.eager(),
+    # group="dbt_test_layer"  # Đổi tên group
+)
 def dbt_warehouse_tests(context, dbt: DbtCliResource):
     yield from dbt.cli(["run"], context=context).stream()
     yield from dbt.cli(["test"], context=context).stream()
+
+# @dbt_assets(
+#     manifest="/opt/dagster/app/etl_pipeline/dbt/warehouse_tests/target/manifest.json",
+#     deps=[
+#         AssetKey("warehouse_dim_customer"),
+#         AssetKey("warehouse_dim_product"),
+#         AssetKey("warehouse_fact_sales")
+#     ],
+#     auto_materialize_policy=AutoMaterializePolicy.eager(),
+#     group="dbt_test_layer"  # Đổi tên group
+# )
+# def dbt_warehouse_tests(context, dbt: DbtCliResource):
+#     yield from dbt.cli(["run"], context=context).stream()
+#     yield from dbt.cli(["test"], context=context).stream()
 
 defs = Definitions(
     assets=ls_asset + [dbt_warehouse_tests],

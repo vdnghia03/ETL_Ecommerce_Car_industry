@@ -38,5 +38,7 @@ clean-targets:
 models:
   warehouse_tests:
     warehouse:
-      +materialized: table
-      +schema: warehouse
+      +materialized: view
+      +schema: view_analysis
+
+

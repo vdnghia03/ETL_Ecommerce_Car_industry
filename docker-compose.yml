@@ -1,10 +1,11 @@
-# version: '3.9'
+
+version: '3.9'
 services:
   minio:
     hostname: minio
     image: minio/minio
     container_name: minio
-    volumes: 
+    volumes:
       - ./MinIO/storage:/data
       - ./MinIO/config:/root/.minio
     ports:
@@ -15,6 +16,7 @@ services:
     command: server /data --console-address ":9090"
     networks:
       - de_network
+
   mc:
     image: minio/mc
     container_name: mc
@@ -22,7 +24,7 @@ services:
     env_file:
       - ./.env
     entrypoint: >
-          /bin/sh -c " until (/usr/bin/mc config host add minio http://minio:9000 minio minio123) do echo '...waiting...' && sleep 1;done; /usr/bin/mc mb minio/warehouse; /usr/bin/mc policy set public minio/warehouse; exit 0; "          
+          /bin/sh -c " until (/usr/bin/mc config host add minio http://minio:9000 minio minio123) do echo '...waiting...' && sleep 1;done; /usr/bin/mc mb minio/warehouse; /usr/bin/mc policy set public minio/warehouse; exit 0; "
     depends_on:
       - minio
     networks:
@@ -48,20 +50,43 @@ services:
       - ./.env
     ports:
       - '5432:5432'
-    volumes: 
+    volumes:
       - ./storage/de_postgres_data:/var/lib/postgresql/data
     networks:
       - de_network
-    
+
+  postgres_metabase:
+    image: postgres:15-alpine
+    container_name: postgres_metabase
+    environment:
+      POSTGRES_USER: metabase_user
+      POSTGRES_PASSWORD: metabase_password
+      POSTGRES_DB: metabase_db
+    volumes:
+      - ./storage/postgres_metabase_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"  # Sử dụng port 5433 để tránh xung đột với de_psql
+    networks:
+      - de_network
+
   de_metabase:
     image: metabase/metabase:v0.45.0
     container_name: de_metabase
     ports:
       - "3000:3000"
     volumes:
-      - ./metabase-data:/metabase-data
+      - ./metabase-data:/metabase-data  # Volume này vẫn giữ để log hoặc dữ liệu tạm
     env_file:
       - ./.env
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase_db
+      MB_DB_PORT: 5432
+      MB_DB_USER: metabase_user
+      MB_DB_PASS: metabase_password
+      MB_DB_HOST: postgres_metabase  # Kết nối với service postgres_metabase
+    depends_on:
+      - postgres_metabase
     networks:
       - de_network
 
@@ -86,7 +111,7 @@ services:
       - "3001"
     ports:
       - "3001:3001"
-    volumes: # Make docker client accessible so we can terminate containers from dagit
+    volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./dagster_home:/opt/dagster/dagster_home
     env_file:
@@ -100,15 +125,14 @@ services:
       - dagster-daemon
       - run
     container_name: de_dagster_daemon
-    volumes: # Make docker client accessible so we can launch containers using host docker
+    volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./dagster_home:/opt/dagster/dagster_home
     env_file:
       - ./.env
     networks:
       - de_network
-    
-  # Pipelines
+
   etl_pipeline:
     build:
       context: ./etl_pipeline
@@ -121,8 +145,12 @@ services:
       - ./.env
     networks:
       - de_network
-  
+
 networks:
   de_network:
     driver: bridge
     name: de_network
+
+volumes:
+  postgres_metabase_data:
+  metabase-data:

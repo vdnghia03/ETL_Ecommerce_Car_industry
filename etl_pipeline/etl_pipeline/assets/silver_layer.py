@@ -440,7 +440,16 @@ def silver_erp_px_cat_g1v2(erp_px_cat_g1v2: pd.DataFrame) -> Output[pd.DataFrame
     # Create a copy of the input DataFrame to avoid modifying the original
     cat_info = erp_px_cat_g1v2.copy()
 
-    # Step 1: Select the required columns
+
+    # Step 1: Transform
+    # cat: Remove leading and trailing spaces
+    cat_info['cat'] = cat_info['cat'].str.strip()
+    # subcat: Remove leading and trailing spaces
+    cat_info['subcat'] = cat_info['subcat'].str.strip()
+    # maintenance: Remove leading and trailing spaces
+    cat_info['maintenance'] = cat_info['maintenance'].str.strip()
+
+    # Step 2: Select the required columns
     result = cat_info[[
         'id',
         'cat',
@@ -448,7 +457,7 @@ def silver_erp_px_cat_g1v2(erp_px_cat_g1v2: pd.DataFrame) -> Output[pd.DataFrame
         'maintenance'
     ]]
 
-    # Step 2: Enforce data types to match SQL table schema
+    # Step 3: Enforce data types to match SQL table schema
     result = result.astype({
         'id': 'object',         # NVARCHAR(50)
         'cat': 'object',        # NVARCHAR(50)
